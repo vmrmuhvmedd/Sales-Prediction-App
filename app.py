@@ -1,0 +1,66 @@
+from flask import Flask, render_template, request, jsonify
+import joblib
+import pickle
+import pandas as pd
+from dotenv import load_dotenv
+import os
+
+app = Flask(__name__)
+
+model = joblib.load('best_model.pkl')
+feature_columns = joblib.load('features_columns.pkl')
+
+region_data = {'South': {'Henderson': ['Kentucky'], 'Fort Lauderdale': ['Florida'], 'Memphis': ['Tennessee'], 'Columbia': ['South Carolina', 'Tennessee'], 'Franklin': ['Tennessee'], 'Tampa': ['Florida'], 'Murfreesboro': ['Tennessee'], 'Pembroke Pines': ['Florida'], 'Jackson': ['Mississippi', 'Tennessee'], 'Lakeland': ['Florida'], 'Jacksonville': ['Florida', 'North Carolina'], 'Richmond': ['Kentucky', 'Virginia'], 'Warner Robins': ['Georgia'], 'Waynesboro': ['Virginia'], 'Saint Petersburg': ['Florida'], 'Arlington': ['Virginia'], 'Florence': ['Kentucky', 'Alabama', 'South Carolina'], 'Louisville': ['Kentucky'], 'Springfield': ['Virginia'], 'Miami': ['Florida'], 'Monroe': ['North Carolina', 'Louisiana'], 'Jonesboro': ['Arkansas'], 'Harrisonburg': ['Virginia'], 'Coral Springs': ['Florida'], 'Boynton Beach': ['Florida'], 'Columbus': ['Georgia'], 'Smyrna': ['Georgia', 'Tennessee'], 'Lafayette': ['Louisiana'], 'Suffolk': ['Virginia'], 'Charlotte': ['North Carolina'], 'Bowling Green': ['Kentucky'], 'Montgomery': ['Alabama'], 'Auburn': ['Alabama'], 'Little Rock': ['Arkansas'], 'Southaven': ['Mississippi'], 'Roswell': ['Georgia'], 'Fayetteville': ['North Carolina', 'Arkansas'], 'Alexandria': ['Virginia'], 'Raleigh': ['North Carolina'], 'Hialeah': ['Florida'], 'Pompano Beach': ['Florida'], 'Chesapeake': ['Virginia'], 'Atlanta': ['Georgia'], 'Lake Charles': ['Louisiana'], 'Mount Pleasant': ['South Carolina'], 'Murray': ['Kentucky'], 'Chattanooga': ['Tennessee'], 'Tallahassee': ['Florida'], 'Gulfport': ['Mississippi'], 'Mobile': ['Alabama'], 'Macon': ['Georgia'], 'Plantation': ['Florida'], 'Greensboro': ['North Carolina'], 'Bristol': ['Tennessee'], 'Nashville': ['Tennessee'], 'Port Saint Lucie': ['Florida'], 'Miramar': ['Florida'], 'Sandy Springs': ['Georgia'], 'Hampton': ['Virginia'], 'Marietta': ['Georgia'], 'Burlington': ['North Carolina'], 'Deltona': ['Florida'], 'Texarkana': ['Arkansas'], 'Knoxville': ['Tennessee'], 'Palm Coast': ['Florida'], 'Apopka': ['Florida'], 'Concord': ['North Carolina'], 'Conway': ['Arkansas'], 'Decatur': ['Alabama'], 'Hattiesburg': ['Mississippi'], 'Georgetown': ['Kentucky'], 'Hendersonville': ['Tennessee'], 'Salem': ['Virginia'], 'Orlando': ['Florida'], 'Virginia Beach': ['Virginia'], 'Charlottesville': ['Virginia'], 'Wilson': ['North Carolina'], 'Hot Springs': ['Arkansas'], 'North Charleston': ['South Carolina'], 'Tuscaloosa': ['Alabama'], 'Greenville': ['North Carolina'], 'Newport News': ['Virginia'], 'Bossier City': ['Louisiana'], 'East Point': ['Georgia'], 'Durham': ['North Carolina'], 'Daytona Beach': ['Florida'], 'Athens': ['Georgia'], 'Clarksville': ['Tennessee'], 'Sanford': ['Florida'], 'Coral Gables': ['Florida'], 'Hollywood': ['Florida']}, 'West': {'Los Angeles': ['California'], 'Orem': ['Utah'], 'Aurora': ['Colorado'], 'Seattle': ['Washington'], 'Roseville': ['California'], 'Denver': ['Colorado'], 'San Francisco': ['California'], 'Colorado Springs': ['Colorado'], 'Arvada': ['Colorado'], 'Concord': ['California'], 'Phoenix': ['Arizona'], 'Costa Mesa': ['California'], 'Parker': ['Colorado'], 'San Diego': ['California'], 'Vallejo': ['California'], 'Vancouver': ['Washington'], 'Long Beach': ['California'], 'Lancaster': ['California'], 'Lake Elsinore': ['California'], 'Edmonds': ['Washington'], 'Santa Ana': ['California'], 'Torrance': ['California'], 'Mesa': ['Arizona'], 'Oceanside': ['California'], 'Louisville': ['Colorado'], 'Olympia': ['Washington'], 'Encinitas': ['California'], 'Fresno': ['California'], 'Pasadena': ['California'], 'Tucson': ['Arizona'], 'Pico Rivera': ['California'], 'Provo': ['Utah'], 'Glendale': ['Arizona'], 'North Las Vegas': ['Nevada'], 'Laguna Niguel': ['California'], 'Kent': ['Washington'], 'Oakland': ['California'], 'San Jose': ['California'], 'Auburn': ['Washington'], 'Redmond': ['Oregon'], 'Henderson': ['Nevada'], 'Spokane': ['Washington'], 'Springfield': ['Oregon'], 'Broomfield': ['Colorado'], 'Brentwood': ['California'], 'Peoria': ['Arizona'], 'Pomona': ['California'], 'Ontario': ['California'], 'Redlands': ['California'], 'Sunnyvale': ['California'], 'Littleton': ['Colorado'], 'Sacramento': ['California'], 'Farmington': ['New Mexico'], 'Scottsdale': ['Arizona'], 'Bellingham': ['Washington'], 'Hesperia': ['California'], 'Gilbert': ['Arizona'], 'Bakersfield': ['California'], 'Redondo Beach': ['California'], 'Las Cruces': ['New Mexico'], 'Tempe': ['Arizona'], 'West Jordan': ['Utah'], 'Gresham': ['Oregon'], 'Meridian': ['Idaho'], 'Fort Collins': ['Colorado'], 'Mission Viejo': ['California'], 'Las Vegas': ['Nevada'], 'Inglewood': ['California'], 'Chula Vista': ['California'], 'Lakewood': ['California'], 'Boise': ['Idaho'], 'Citrus Heights': ['California'], 'Bullhead City': ['Arizona'], 'San Gabriel': ['California'], 'Manteca': ['California'], 'Danville': ['California'], 'Pasco': ['Washington'], 'Anaheim': ['California'], 'Chandler': ['Arizona'], 'Draper': ['Utah'], 'Apple Valley': ['California'], 'Salem': ['Oregon'], 'Pocatello': ['Idaho'], 'Fairfield': ['California'], 'Lake Forest': ['California'], 'Cheyenne': ['Wyoming'], 'Caldwell': ['Idaho'], 'Sierra Vista': ['Arizona'], 'Portland': ['Oregon'], 'Chico': ['California'], 'Eugene': ['Oregon'], 'Oxnard': ['California'], 'Rio Rancho': ['New Mexico'], 'Thousand Oaks': ['California'], 'El Cajon': ['California'], 'Longview': ['Washington'], 'Salinas': ['California'], 'Helena': ['Montana'], 'Bellevue': ['Washington'], 'Burbank': ['California'], 'Camarillo': ['California'], 'Tigard': ['Oregon'], 'Covington': ['Washington'], 'Westminster': ['California'], 'Longmont': ['Colorado'], 'Thornton': ['Colorado'], 'Morgan Hill': ['California'], 'Modesto': ['California'], 'Greeley': ['Colorado'], 'Hillsboro': ['Oregon'], 'Twin Falls': ['Idaho'], 'Stockton': ['California'], 'Des Moines': ['Washington'], 'Moreno Valley': ['California'], 'Santa Barbara': ['California'], 'San Bernardino': ['California']}, 'East': {'Philadelphia': ['Pennsylvania'], 'Troy': ['New York', 'Ohio'], 'New York City': ['New York'], 'Wilmington': ['Delaware'], 'Newark': ['Ohio', 'Delaware'], 'Medina': ['Ohio'], 'Dublin': ['Ohio'], 'Columbus': ['Ohio'], 'Belleville': ['New Jersey'], 'Hackensack': ['New Jersey'], 'Manchester': ['Connecticut'], 'Franklin': ['Massachusetts'], 'Lawrence': ['Massachusetts'], 'Akron': ['Ohio'], 'Cleveland': ['Ohio'], 'Dover': ['Delaware', 'New Hampshire'], 'Oceanside': ['New York'], 'Lorain': ['Ohio'], 'Concord': ['New Hampshire'], 'Rochester': ['New York'], 'Norwich': ['Connecticut'], 'Auburn': ['New York'], 'Washington': ['District of Columbia'], 'Yonkers': ['New York'], 'Cuyahoga Falls': ['Ohio'], 'Rockville': ['Maryland'], 'Chester': ['Pennsylvania'], 'Middletown': ['Connecticut'], 'Vineland': ['New Jersey'], 'Allentown': ['Pennsylvania'], 'Everett': ['Massachusetts'], 'Watertown': ['New York'], 'Long Beach': ['New York'], 'Fairfield': ['Ohio', 'Connecticut'], 'Providence': ['Rhode Island'], 'York': ['Pennsylvania'], 'Cincinnati': ['Ohio'], 'Lancaster': ['Pennsylvania', 'Ohio'], 'Marion': ['Ohio'], 'Bangor': ['Maine'], 'Holyoke': ['Massachusetts'], 'Passaic': ['New Jersey'], 'Westfield': ['New Jersey'], 'Malden': ['Massachusetts'], 'Lowell': ['Massachusetts'], 'Lakewood': ['Ohio', 'New Jersey'], 'Quincy': ['Massachusetts'], 'Bristol': ['Connecticut'], 'Hempstead': ['New York'], 'Revere': ['Massachusetts'], 'Columbia': ['Maryland'], 'Springfield': ['Ohio'], 'Clinton': ['Maryland'], 'Toledo': ['Ohio'], 'Woonsocket': ['Rhode Island'], 'Freeport': ['New York'], 'Cranston': ['Rhode Island'], 'Baltimore': ['Maryland'], 'New Rochelle': ['New York'], 'Hamilton': ['Ohio'], 'Mentor': ['Ohio'], 'Rome': ['New York'], 'Waterbury': ['Connecticut'], 'Buffalo': ['New York'], 'Parma': ['Ohio'], 'Gaithersburg': ['Maryland'], 'Bethlehem': ['Pennsylvania'], 'Burlington': ['Vermont'], 'Morristown': ['New Jersey'], 'Milford': ['Connecticut'], 'Meriden': ['Connecticut'], 'Reading': ['Pennsylvania'], 'Nashua': ['New Hampshire'], 'Paterson': ['New Jersey'], 'Clifton': ['New Jersey'], 'Cambridge': ['Massachusetts'], 'Andover': ['Massachusetts'], 'Danbury': ['Connecticut'], 'Utica': ['New York'], 'Marlborough': ['Massachusetts'], 'Laurel': ['Maryland'], 'Perth Amboy': ['New Jersey'], 'Wheeling': ['West Virginia'], 'Mason': ['Ohio']}, 'Central': {'Richardson': ['Texas'], 'Houston': ['Texas'], 'New Albany': ['Indiana'], 'Chicago': ['Illinois'], 'Minneapolis': ['Minnesota'], 'Bloomington': ['Illinois', 'Indiana'], 'Franklin': ['Wisconsin'], 'San Antonio': ['Texas'], 'Detroit': ['Michigan'], 'Lakeville': ['Minnesota'], 'Canton': ['Michigan'], 'Columbus': ['Indiana'], 'Decatur': ['Illinois'], 'Park Ridge': ['Illinois'], 'Amarillo': ['Texas'], 'Gladstone': ['Missouri'], 'Fort Worth': ['Texas'], 'Dearborn': ['Michigan'], 'Aurora': ['Illinois'], 'Arlington': ['Texas'], 'Tyler': ['Texas'], 'Trenton': ['Michigan'], 'Des Moines': ['Iowa'], 'Omaha': ['Nebraska'], 'Milwaukee': ['Wisconsin'], 'Round Rock': ['Texas'], 'Jefferson City': ['Missouri'], 'Saint Peters': ['Missouri'], 'Rockford': ['Illinois'], 'La Porte': ['Indiana', 'Texas'], 'Evanston': ['Illinois'], 'Pasadena': ['Texas'], 'El Paso': ['Texas'], 'Peoria': ['Illinois'], 'Carrollton': ['Texas'], 'Madison': ['Wisconsin'], 'Muskogee': ['Oklahoma'], 'Springfield': ['Missouri'], 'Rochester': ['Minnesota'], 'Richmond': ['Indiana'], 'Moorhead': ['Minnesota'], 'Lansing': ['Michigan'], 'Grand Prairie': ['Texas'], 'College Station': ['Texas'], 'Dallas': ['Texas'], 'Laredo': ['Texas'], 'San Angelo': ['Texas'], 'Sioux Falls': ['South Dakota'], 'Huntsville': ['Texas'], 'Mishawaka': ['Indiana'], 'Lafayette': ['Indiana'], 'Wheeling': ['Illinois'], 'Tulsa': ['Oklahoma'], 'Corpus Christi': ['Texas'], 'Woodstock': ['Illinois'], 'Highland Park': ['Illinois'], 'Saginaw': ['Michigan'], 'Skokie': ['Illinois'], 'Allen': ['Texas'], 'Pharr': ['Texas'], 'Brownsville': ['Texas'], 'Lincoln Park': ['Michigan'], 'Austin': ['Texas'], 'Tinley Park': ['Illinois'], 'Dubuque': ['Iowa'], 'Dearborn Heights': ['Michigan'], 'Carol Stream': ['Illinois'], 'Saint Cloud': ['Minnesota'], 'Plano': ['Texas'], 'Jackson': ['Michigan'], 'Mesquite': ['Texas'], 'Odessa': ['Texas'], 'West Allis': ['Wisconsin'], 'Champaign': ['Illinois'], 'Harlingen': ['Texas'], 'Greenwood': ['Indiana'], 'Kenosha': ['Wisconsin'], 'Fremont': ['Nebraska'], 'Freeport': ['Illinois'], 'Port Arthur': ['Texas'], 'Lawton': ['Oklahoma'], 'Mount Pleasant': ['Michigan'], 'League City': ['Texas'], 'Oklahoma City': ['Oklahoma'], 'Kirkwood': ['Missouri'], 'Taylor': ['Michigan'], 'Midland': ['Michigan'], 'Waco': ['Texas'], 'Garland': ['Texas'], 'Wichita': ['Kansas'], 'Oak Park': ['Michigan'], 'Olathe': ['Kansas'], 'La Crosse': ['Wisconsin'], 'Buffalo Grove': ['Illinois'], 'Roseville': ['Minnesota'], 'Lubbock': ['Texas'], 'Westland': ['Michigan'], 'Elmhurst': ['Illinois'], 'Texas City': ['Texas'], 'Naperville': ['Illinois'], 'Normal': ['Illinois'], 'Saint Charles': ['Missouri', 'Illinois'], 'Superior': ['Wisconsin'], 'Des Plaines': ['Illinois'], 'Rapid City': ['South Dakota'], 'Noblesville': ['Indiana'], 'Frisco': ['Texas'], 'San Marcos': ['Texas'], 'Mansfield': ['Texas'], 'Green Bay': ['Wisconsin'], 'Eau Claire': ['Wisconsin'], 'Columbia': ['Missouri'], 'Mcallen': ['Texas'], 'Broken Arrow': ['Oklahoma'], 'Beaumont': ['Texas'], 'Marion': ['Iowa'], 'Bryan': ['Texas'], 'Indianapolis': ['Indiana']}}
+
+@app.route('/')
+def index():
+    return render_template('index.html', region_data=region_data)
+
+@app.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
+
+@app.route('/get_cities/<region>')
+def get_cities(region):
+    return jsonify(list(region_data[region].keys()))
+
+@app.route('/get_states/<region>/<city>')
+def get_states(region, city):
+    return jsonify(region_data[region][city])
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.form.to_dict()
+    
+
+    try:
+        quantity = int(data.get('quantity', 0))
+        discount = float(data.get('discount', 0.0))
+        profit = float(data.get('profit', 0.0))
+    except ValueError:
+        return jsonify({'error': 'Invalid numerical input'}), 400
+
+    df = pd.DataFrame([{
+        'Ship Mode': data['ship_mode'],
+        'Segment': data['segment'],
+        'City': data['city'],
+        'State': data['state'],
+        'Region': data['region'],
+        'Sub-Category': data['sub_category'],
+        'Quantity': quantity,
+        'Discount': discount,
+        'Profit': profit
+    }])
+
+    df_encoded = pd.get_dummies(df, drop_first=True)
+    df_encoded = df_encoded.reindex(columns=feature_columns, fill_value=0)
+
+    prediction = model.predict(df_encoded)[0]
+    return jsonify({'prediction': f'${prediction:.2f}'})
+
+if __name__ == '__main__':
+
+    host = os.getenv('FLASK_HOST', '0.0.0.0')
+    port = int(os.getenv('FLASK_PORT', 5000))
+    debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(host=host, port=port, debug=debug)

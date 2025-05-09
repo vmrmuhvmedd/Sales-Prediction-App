@@ -1,0 +1,112 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+}
+.navbar {
+    background-color: var(--primary-color) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.hero-section {
+    background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+    color: white;
+    padding: 1rem 0;
+    margin-bottom: 3rem;
+}
+.prediction-card {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 2.5rem;
+    margin: 2rem auto;
+    max-width: 800px;
+}
+.form-label {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+.btn-predict {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+.btn-predict:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+.result-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+footer {
+    background-color: var(--primary-color);
+    color: white;
+    /* padding: 2rem 0;
+    margin-top: 4rem; */
+}
+.discount-output {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+.doc-header {
+    background: linear-gradient(135deg, var(--secondary-color), #2980b9);
+    color: white;
+    padding: 1rem 0;
+}
+.section-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+.model-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+}
+.model-table th, .model-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+.model-table th {
+    background-color: var(--primary-color);
+    color: white;
+}
+.challenge-table {
+    width: 100%;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+.challenge-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+.custom-list li {
+    margin-bottom: 0.8rem;
+    /* padding-left: 0.5rem; */
+    position: relative;
+}

@@ -1,0 +1,11 @@
+flask
+numpy
+scipy
+scikit-learn==1.5.1
+pandas
+gunicorn
+Werkzeug
+MarkupSafe
+Jinja2
+python-dotenv
+xgboost
